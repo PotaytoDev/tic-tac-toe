@@ -26,16 +26,21 @@ end
 class Player
   attr_accessor :is_my_turn, :player_symbol
 
-  def initialize
-    @is_my_turn = false
+  def initialize(is_my_turn, player_symbol)
+    @is_my_turn = is_my_turn
+    @player_symbol = player_symbol
     @opponent_player = nil
-    @player_symbol = ''
   end
 
   # Get player input, validate, and return move selection to be made
   def make_move
     # Get player input
+    print 'Enter row index: '
+    row_index = gets.chomp.to_i
+    print 'Enter column index: '
+    column_index = gets.chomp.to_i
     # Validate through module methods
     # Return input as array of [row_index, column_index, player_symbol]
+    [row_index, column_index, @player_symbol]
   end
 end

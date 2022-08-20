@@ -1,27 +1,27 @@
-class Board
-  attr_reader :board
+class Grid
+  attr_reader :grid
 
-  # The board is a 3x3 two dimensional array created when the object
+  # The grid is a 3x3 two dimensional array created when the object
   # is instantiated.
   def initialize
-    @board = Array.new(3).map do
+    @grid = Array.new(3).map do
       Array.new(3, ' ')
     end
   end
 
-  # The to_s() method is overridden to display the board as a grid of
-  # three rows and three columns.
+  # The to_s() method is overridden to display the grid as three rows
+  # and three columns.
   def to_s
-    board_to_print = @board.map do |row|
+    grid_to_print = @grid.map do |row|
       row.join('|')
     end
 
-    board_to_print.join("\n")
+    grid_to_print.join("\n")
   end
 
-  # The update_board() method will update the board with the player's move.
-  def update_board(row_index, column_index, player_symbol)
-    @board[row_index][column_index] = player_symbol
+  # The update_grid() method will update the grid with the player's move.
+  def update_grid(row_index, column_index, player_symbol)
+    @grid[row_index][column_index] = player_symbol
   end
 end
 
@@ -47,21 +47,23 @@ class Player
   end
 end
 
-def check_rows(board)
+def check_rows(grid)
   winner_declared = true
 
-  board.each_with_index do |row, row_index|
+  grid.each_with_index do |row, row_index|
     winner_declared = true
 
     row.each_with_index do |_column, column_index|
-      if board[row_index][column_index] == ' '
+      if grid[row_index][column_index] == ' '
         winner_declared = false
         break
       end
 
       next if column_index.zero?
 
-      winner_declared = false if board[row_index][column_index] != board[row_index][column_index - 1]
+      if grid[row_index][column_index] != grid[row_index][column_index - 1]
+        winner_declared = false
+      end
     end
 
     break if winner_declared
@@ -70,8 +72,8 @@ def check_rows(board)
   winner_declared
 end
 
-def check_board_for_winner(board)
-  check_rows(board)
+def check_grid_for_winner(grid)
+  check_rows(grid)
 
   # check_columns()
   # check_diagonals()

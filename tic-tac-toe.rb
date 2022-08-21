@@ -102,6 +102,52 @@ def check_rows_or_columns(grid, direction_to_check = 'rows')
   winner_declared
 end
 
+def check_top_left_to_bottom_right_diagonal(grid)
+  row_index = 0
+  column_index = 0
+
+  return false if grid[row_index][column_index] == ' '
+
+  winner_declared = true
+
+  2.times do
+    if grid[row_index][column_index] != grid[row_index + 1][column_index + 1]
+      winner_declared = false
+    end
+
+    row_index += 1
+    column_index += 1
+  end
+
+  winner_declared
+end
+
+def check_bottom_left_top_right_diagonal(grid)
+  row_index = 0
+  column_index = grid.length - 1
+
+  return false if grid[row_index][column_index] == ' '
+
+  winner_declared = true
+
+  2.times do
+    if grid[row_index][column_index] != grid[row_index + 1][column_index - 1]
+      winner_declared = false
+    end
+
+    row_index += 1
+    column_index -= 1
+  end
+
+  winner_declared
+end
+
+def check_diagonals(grid)
+  return true if check_top_left_to_bottom_right_diagonal(grid)
+
+  check_bottom_left_top_right_diagonal(grid)
+end
+
 def check_grid_for_winner(grid)
   if check_rows_or_columns(grid, 'rows')
     puts 'Row matches!'
@@ -111,7 +157,10 @@ def check_grid_for_winner(grid)
     puts 'Column matches!'
     return
   end
+  if check_diagonals(grid)
+    puts 'Diagonal matches!'
+    return
+  end
 
   puts 'No winner!'
-  # check_diagonals()
 end

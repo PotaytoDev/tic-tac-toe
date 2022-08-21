@@ -47,21 +47,51 @@ class Player
   end
 end
 
-def check_rows(grid)
+# Check if a grid cell is empty
+def empty_grid_cell?(grid, first_index, second_index, direction_to_check)
+  case direction_to_check
+  when 'rows'
+    row_index = first_index
+    column_index = second_index
+  when 'columns'
+    row_index = second_index
+    column_index = first_index
+  end
+
+  grid[row_index][column_index] == ' '
+end
+
+# Check whether a grid cell matches the previous grid cell in a given direction
+def grid_cells_match?(grid, first_index, second_index, direction_to_check)
+  case direction_to_check
+  when 'rows'
+    row_index = first_index
+    column_index = second_index
+    grid[row_index][column_index] == grid[row_index][column_index - 1]
+
+  when 'columns'
+    row_index = second_index
+    column_index = first_index
+    grid[row_index][column_index] == grid[row_index - 1][column_index]
+  end
+end
+
+# Check rows or columns to determine if any of them have three matching symbols
+def check_rows_or_columns(grid, direction_to_check = 'rows')
   winner_declared = true
 
-  grid.each_with_index do |row, row_index|
+  grid.each_with_index do |row, first_index|
     winner_declared = true
 
-    row.each_with_index do |_column, column_index|
-      if grid[row_index][column_index] == ' '
+    row.each_with_index do |_column, second_index|
+      if empty_grid_cell?(grid, first_index, second_index, direction_to_check)
         winner_declared = false
         break
       end
 
-      next if column_index.zero?
+      next if second_index.zero?
 
-      if grid[row_index][column_index] != grid[row_index][column_index - 1]
+      unless grid_cells_match?(grid, first_index, second_index, direction_to_check)
         winner_declared = false
       end
     end
@@ -73,8 +103,15 @@ def check_rows(grid)
 end
 
 def check_grid_for_winner(grid)
-  check_rows(grid)
+  if check_rows_or_columns(grid, 'rows')
+    puts 'Row matches!'
+    return
+  end
+  if check_rows_or_columns(grid, 'columns')
+    puts 'Column matches!'
+    return
+  end
 
-  # check_columns()
+  puts 'No winner!'
   # check_diagonals()
 end

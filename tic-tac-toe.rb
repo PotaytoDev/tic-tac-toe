@@ -21,7 +21,9 @@ class Grid
 
   # The update_grid() method will update the grid with the player's move.
   def update_grid(row_index, column_index, player_symbol)
-    @grid[row_index][column_index] = player_symbol
+    if @grid[row_index][column_index] == ' '
+      @grid[row_index][column_index] = player_symbol
+    end
   end
 end
 
@@ -149,18 +151,61 @@ def check_diagonals(grid)
 end
 
 def check_grid_for_winner(grid)
-  if check_rows_or_columns(grid, 'rows')
-    puts 'Row matches!'
-    return
+  return true if check_rows_or_columns(grid, 'rows')
+  return true if check_rows_or_columns(grid, 'columns')
+
+  check_diagonals(grid)
+end
+
+def player_make_move(player, grid)
+  player_move = player.make_move
+
+  until grid.update_grid(player_move[0], player_move[1], player_move[2])
+    puts 'Invalid input'
+    player_move = player.make_move
   end
-  if check_rows_or_columns(grid, 'columns')
-    puts 'Column matches!'
-    return
-  end
-  if check_diagonals(grid)
-    puts 'Diagonal matches!'
-    return
+end
+
+def play_game
+  player1 = Player.new(true, 'x')
+  player2 = Player.new(false, 'o')
+  grid = Grid.new
+  turns_taken = 0
+  winner_declared = false
+
+  while turns_taken <= 9
+    puts '----------------------------'
+    puts "Player 1's turn\n"
+    player_make_move(player1, grid)
+
+    turns_taken += 1
+    puts grid
+
+    if turns_taken >= 5 && check_grid_for_winner(grid.grid)
+      winner_declared = true
+      break
+    end
+
+    break if turns_taken >= 9
+
+    puts '----------------------------'
+    puts "Player 2's turn\n"
+    player_make_move(player2, grid)
+
+    turns_taken += 1
+    puts grid
+
+    if turns_taken >= 5 && check_grid_for_winner(grid.grid)
+      winner_declared = true
+      break
+    end
   end
 
-  puts 'No winner!'
+  if winner_declared
+    puts 'Player wins!'
+  else
+    puts 'Game is a draw!'
+  end
 end
+
+play_game

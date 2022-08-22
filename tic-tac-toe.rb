@@ -2,30 +2,41 @@ class Grid
   attr_reader :grid
 
   # The grid is a 3x3 two dimensional array created when the object
-  # is instantiated.
+  # is instantiated
   def initialize
     @grid = Array.new(3).map do
       Array.new(3, ' ')
     end
   end
 
-  # The to_s() method is overridden to display the grid as three rows
-  # and three columns.
+  # The to_s() method is overridden to display the grid as four rows
+  # and four columns. With letters on the first row and numbers on the first
+  # column, indicating the possible move selections a player can make
   def to_s
     grid_to_print = @grid.map do |row|
       row.join('|')
     end
 
+    grid_to_print.unshift('  A B C')
+
+    grid_to_print.each_with_index do |_element, index|
+      next if index.zero?
+
+      grid_to_print[index] = "#{index} #{grid_to_print[index]}"
+    end
+
     grid_to_print.join("\n")
   end
 
+  # Public predicate method that acts as an in-between for the private
+  # update_grid() method for better code readility
   def update_grid_successful?(row_index, column_index, player_symbol)
     update_grid(row_index, column_index, player_symbol)
   end
 
   private
 
-  # The update_grid() method will update the grid with the player's move.
+  # Updates the grid with the player's move.
   def update_grid(row_index, column_index, player_symbol)
     if @grid[row_index][column_index] == ' '
       @grid[row_index][column_index] = player_symbol
@@ -33,7 +44,42 @@ class Grid
   end
 end
 
+module ValidatePlayerInput
+  # Returns an array with the nine different possible choices a player can make
+  def possible_player_choices
+    acceptable_player_choices = []
+    i = 1
+
+    3.times do
+      ('A'..'C').each do |letter|
+        acceptable_player_choices.push(letter + i.to_s)
+      end
+
+      i += 1
+    end
+
+    acceptable_player_choices
+  end
+
+  # Validate player's input
+  def acceptable_player_input?(player_input)
+    possible_player_choices.include?(player_input)
+  end
+
+  # Changes player's input from a string in the form of "A1" into an
+  # array of indices that can be used to access the grid cells of the grid
+  def transform_player_input(player_input)
+    player_input_array = player_input.split('')
+    player_input_array[0] = player_input_array[0].ord - 'A'.ord
+    player_input_array[1] = player_input_array[1].to_i - 1
+
+    player_input_array.reverse
+  end
+end
+
 class Player
+  include ValidatePlayerInput
+
   def initialize(player_symbol)
     @player_symbol = player_symbol
   end
@@ -41,13 +87,20 @@ class Player
   # Get player input, validate, and return move selection to be made
   def make_move
     # Get player input
-    print 'Enter row index: '
-    row_index = gets.chomp.to_i
-    print 'Enter column index: '
-    column_index = gets.chomp.to_i
+    print 'Enter your move selection (in the form of D4): '
+    player_input = gets.chomp
+
     # Validate through module methods
+    until acceptable_player_input?(player_input)
+      puts 'Invalid input. Try again.'
+      print 'Enter your move selection (in the form of D4): '
+      player_input = gets.chomp
+    end
+
+    player_input_array = transform_player_input(player_input)
+
     # Return input as array of [row_index, column_index, player_symbol]
-    [row_index, column_index, @player_symbol]
+    [player_input_array[0], player_input_array[1], @player_symbol]
   end
 end
 
@@ -165,7 +218,7 @@ def player_make_move(player, grid)
   player_move = player.make_move
 
   until grid.update_grid_successful?(player_move[0], player_move[1], player_move[2])
-    puts 'Invalid input. Try again.'
+    puts '-- That spot has already been played. Try again.'
     player_move = player.make_move
   end
 end
@@ -176,6 +229,7 @@ def play_game
   grid = Grid.new
   turns_taken = 0
   winner_declared = false
+  puts grid
 
   while turns_taken <= 9
     puts '----------------------------'

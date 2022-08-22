@@ -232,8 +232,17 @@ def player_name(symbol)
 end
 
 def play_game
-  player1 = Player.new('x', player_name('x'))
-  player2 = Player.new('o', player_name('o'))
+  players = [Player.new('x', player_name('x')), Player.new('o', player_name('o'))]
+  sleep(1)
+  puts "\n"
+  puts 'The player who will start the game will be chosen at random.'
+  puts 'The first player is...'
+  player1 = players.sample
+  sleep(3)
+  puts "#{player1.name}!"
+  puts "\n"
+  player2 = player1.name == players[0] ? players[1] : players[0]
+
   grid = Grid.new
   turns_taken = 0
   winner_declared = false

@@ -241,7 +241,7 @@ def play_game
   sleep(3)
   puts "#{player1.name}!"
   puts "\n"
-  player2 = player1.name == players[0] ? players[1] : players[0]
+  player2 = player1.name == players[0].name ? players[1] : players[0]
 
   grid = Grid.new
   turns_taken = 0

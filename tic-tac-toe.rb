@@ -80,8 +80,11 @@ end
 class Player
   include ValidatePlayerInput
 
-  def initialize(player_symbol)
+  attr_reader :name, :player_symbol
+
+  def initialize(player_symbol, name)
     @player_symbol = player_symbol
+    @name = name
   end
 
   # Get player input, validate, and return move selection to be made
@@ -223,17 +226,23 @@ def player_make_move(player, grid)
   end
 end
 
+def player_name(symbol)
+  print "Enter name of player who will use '#{symbol}': "
+  gets.chomp
+end
+
 def play_game
-  player1 = Player.new('x')
-  player2 = Player.new('o')
+  player1 = Player.new('x', player_name('x'))
+  player2 = Player.new('o', player_name('o'))
   grid = Grid.new
   turns_taken = 0
   winner_declared = false
+  winning_player = nil
   puts grid
 
   while turns_taken <= 9
     puts '----------------------------'
-    puts "Player 1's turn\n"
+    puts "#{player1.name}'s turn (\"#{player1.player_symbol}\")"
     player_make_move(player1, grid)
 
     turns_taken += 1
@@ -241,13 +250,14 @@ def play_game
 
     if turns_taken >= 5 && check_grid_for_winner(grid.grid)
       winner_declared = true
+      winning_player = player1
       break
     end
 
     break if turns_taken >= 9
 
     puts '----------------------------'
-    puts "Player 2's turn\n"
+    puts "#{player2.name}'s turn (\"#{player2.player_symbol}\")"
     player_make_move(player2, grid)
 
     turns_taken += 1
@@ -255,12 +265,13 @@ def play_game
 
     if turns_taken >= 5 && check_grid_for_winner(grid.grid)
       winner_declared = true
+      winning_player = player2
       break
     end
   end
 
   if winner_declared
-    puts 'Player wins!'
+    puts "#{winning_player.name} wins!"
   else
     puts 'Game is a draw!'
   end

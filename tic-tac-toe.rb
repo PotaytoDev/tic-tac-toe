@@ -19,6 +19,12 @@ class Grid
     grid_to_print.join("\n")
   end
 
+  def update_grid_successful?(row_index, column_index, player_symbol)
+    update_grid(row_index, column_index, player_symbol)
+  end
+
+  private
+
   # The update_grid() method will update the grid with the player's move.
   def update_grid(row_index, column_index, player_symbol)
     if @grid[row_index][column_index] == ' '
@@ -28,12 +34,8 @@ class Grid
 end
 
 class Player
-  attr_accessor :is_my_turn, :player_symbol
-
-  def initialize(is_my_turn, player_symbol)
-    @is_my_turn = is_my_turn
+  def initialize(player_symbol)
     @player_symbol = player_symbol
-    @opponent_player = nil
   end
 
   # Get player input, validate, and return move selection to be made
@@ -144,12 +146,14 @@ def check_bottom_left_top_right_diagonal(grid)
   winner_declared
 end
 
+# Check grid's diagonals to see if they have three matching symbols
 def check_diagonals(grid)
   return true if check_top_left_to_bottom_right_diagonal(grid)
 
   check_bottom_left_top_right_diagonal(grid)
 end
 
+# Check grid's rows, columns, and diagonals to see if a player has won
 def check_grid_for_winner(grid)
   return true if check_rows_or_columns(grid, 'rows')
   return true if check_rows_or_columns(grid, 'columns')
@@ -160,15 +164,15 @@ end
 def player_make_move(player, grid)
   player_move = player.make_move
 
-  until grid.update_grid(player_move[0], player_move[1], player_move[2])
-    puts 'Invalid input'
+  until grid.update_grid_successful?(player_move[0], player_move[1], player_move[2])
+    puts 'Invalid input. Try again.'
     player_move = player.make_move
   end
 end
 
 def play_game
-  player1 = Player.new(true, 'x')
-  player2 = Player.new(false, 'o')
+  player1 = Player.new('x')
+  player2 = Player.new('o')
   grid = Grid.new
   turns_taken = 0
   winner_declared = false
